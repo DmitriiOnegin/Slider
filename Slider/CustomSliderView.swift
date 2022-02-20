@@ -9,8 +9,10 @@ import SwiftUI
 
 struct CustomSliderView: View {
     
+    @State private var showAlert = false
     @Binding var value: Double
     @Binding var valueString: String
+    
     let color: Color
     
     var body: some View {
@@ -25,13 +27,33 @@ struct CustomSliderView: View {
             .accentColor(color)
             
             TextField("", text: $valueString, onCommit: {
-                value = Double(valueString) ?? 0
+                textFieldDidEndEditing()
             })
                 .keyboardType(.numbersAndPunctuation)
                 .submitLabel(.done)
                 .padding(10)
                 .frame(width: 60)
                 .background().cornerRadius(15)
+        }
+        .alert("Не корректное значение", isPresented: $showAlert) {
+            
+        }
+        
+    }
+    
+    func textFieldDidEndEditing() {
+        let newValue = Double(valueString) ?? 0
+        switch newValue {
+        case ..<0:
+            value = 0
+            valueString = "0"
+            showAlert = true
+        case 0 ... 1:
+            value = Double(valueString) ?? 0
+        default:
+            value = 1
+            valueString = "1"
+            showAlert = true
         }
     }
 }
